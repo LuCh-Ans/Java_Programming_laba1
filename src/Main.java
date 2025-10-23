@@ -32,7 +32,7 @@ class BankAccount {
     private double balance;
     private List<Transaction> trans;
     private boolean isActive;
-    
+
     public BankAccount(String accNumber, String username, String password) {
         this.accNumber = accNumber;
         this.username = username;
@@ -205,33 +205,81 @@ class BankingSystem {
             return null;
         }
     }
+    //проверка что имя пользователя состоит из символов
+    private static boolean isValidUsername(String username) {
+        if (username.isEmpty()) {
+            return false;
+        }
+
+        for (int i = 0; i < username.length(); i++) {
+            char c = username.charAt(i);//выделяем каждый символ
+            if (!Character.isLetter(c)) {//смотрим, является ли он бувой
+                return false;
+            }
+        }
+        return true;
+    }
+    //проверка валидности пароля: состоит из 4 цифр
+    private static boolean isValidPassword(String password) {
+        if (password.length() != 4) {
+            return false;
+        }
+        for (int i = 0; i < password.length(); i++) {
+            char c = password.charAt(i);//выделяем посимвольно
+            if (!Character.isDigit(c)) {//если нашли не цифру
+                return false;
+            }
+        }
+        return true;
+    }
     //создать новый аккаунт
     private static void createNewAcc() {
         System.out.print("\nCREATE NEW ACCOUNT\n");
-        //читаем имя пользователя, пока не будет непустой ввод
+        //читаем имя пользователя, пока не будет ввод только из символов
         String username;
         while (true) {
-            System.out.print("Enter your name: ");
+            System.out.print("Enter your name (letters only): ");
             username = scanner.nextLine().trim();
-            if (!username.isEmpty()) break;
-            System.out.print("Name can not be empty\n");
+
+            if (username.isEmpty()) {
+                System.out.print("Username can not be empty\n");
+                continue;
+            }
+            if (!isValidUsername(username)) {
+                System.out.print("Name must contain only letters\n");
+                continue;
+            }
+
+            break;
         }
-        //просим ввести пароль, пока не будет непустой ввод
+        //просим ввести пароль, пока не будет из 4 цифр
         String password;
         while (true) {
-            System.out.print("Enter your password: ");
+            System.out.print("Enter your password (4 digits): ");
             password = scanner.nextLine().trim();
-            if (!password.isEmpty()) break;
-            System.out.print("Password can not be empty\n");
+
+            if (password.isEmpty()) {
+                System.out.print("Password can not be empty\n");
+                continue;
+            }
+
+            if (!isValidPassword(password)) {
+                System.out.print("Password must be 4 digits\n");
+                continue;
+            }
+
+            break;
         }
         //подтверждение пароля, проверка на их мэтч
-        System.out.print("Confirm password: ");
-        String password2 = scanner.nextLine().trim();
-        if (!password2.equals(password)) {
-            System.out.print("Passwords are different\n");
-            return;
+        while (true) {
+            System.out.print("Confirm password: ");
+            String password2 = scanner.nextLine().trim();
+            if (!password2.equals(password)) {
+                System.out.print("Passwords are different\n");
+                continue;
+            }
+            break;
         }
-        
         String accNum = numberGenerator();//генерируем счет
         curAcc = new BankAccount(accNum, username, password);//создаем новый объект
         accounts.put(accNum, curAcc);//сохраняем немер счета и объект
@@ -254,7 +302,7 @@ class BankingSystem {
     //вход в аккаунт
     private static void logToAcc() {
         System.out.print("\nLogin");
-        
+
         if (accounts.isEmpty()) {
             System.out.print("No accounts exist yet\n");
             return;
@@ -293,7 +341,7 @@ class BankingSystem {
             System.out.print(acc.getAccNum() + " | " + acc.getUsername() + " | $" + acc.getBalance()+"\n");
         }
     }
-    //работа после авторизации 
+    //работа после авторизации
     private static void accSession() {
         while (true) {
             try {
